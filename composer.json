@@ -1,0 +1,13 @@
+{
+    "name": "proip.info/php-client",
+    "description": "PHP module provides client for proip.info binary databases",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "proip.info",
+            "email": "info@proip.info"
+        }
+    ],
+    "require": {}
+}
