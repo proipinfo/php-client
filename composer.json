@@ -10,7 +10,7 @@
         }
     ],
     "autoload": {
-        "classmap": ["Client.php"]
+        "classmap": ["Client.php", "DbStream.php", "Meta.php", "Record.php"]
     },
     "require": {}
 }
