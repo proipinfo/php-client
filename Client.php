@@ -13,11 +13,11 @@ class Client
     /**
      * Constructor
      *
-     * @param DbStream $file file handler
+     * @param string $filename
      */
-    public function __construct(DbStream $file)
+    public function __construct(string $filename)
     {
-        $this->_file = $file;
+        $this->_file = new DbStream($filename, true);
         $this->_parseMeta();
     }
     
