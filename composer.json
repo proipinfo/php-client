@@ -9,5 +9,8 @@
             "email": "info@proip.info"
         }
     ],
+    "autoload": {
+        "classmap": ["Client.php"]
+    },
     "require": {}
 }
