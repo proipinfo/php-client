@@ -1,16 +1,18 @@
 {
-    "name": "proipinfo/php-client",
-    "description": "PHP module provides client for proip.info binary databases",
-    "type": "library",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "proip.info",
-            "email": "info@proip.info"
-        }
-    ],
-    "autoload": {
-        "classmap": ["Client.php", "DbStream.php", "Meta.php", "Record.php"]
-    },
-    "require": {}
+  "name": "proipinfo/php-client",
+  "description": "PHP module provides client for proip.info binary databases",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "proip.info",
+      "email": "info@proip.info"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "ProIPInfo\\": "src/"
+    }
+  },
+  "require": {}
 }

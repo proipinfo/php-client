@@ -1,6 +1,6 @@
 <?php
 
-namespace proipinfo\ProIPInfo;
+namespace ProIPInfo;
 
 /**
  * DbStream internal class for db client

@@ -1,6 +1,6 @@
 <?php
 
-namespace proipinfo\ProIPInfo;
+namespace ProIPInfo;
 
 /**
  * Meta contains meta info about db
