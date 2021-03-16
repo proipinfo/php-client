@@ -1,48 +1,16 @@
 <?php
-namespace ProIPInfo;
 
-use ProIPInfo\DbStream;
-use ProIPInfo\BinaryPacker;
+namespace ProIPInfo;
 
 class Client
 {
     /**
-     * PUBLIC SECTION
-     */
-
-    /**
-     * Constructor
-     *
-     * @param string $filename
-     */
-    public function __construct(string $filename)
-    {
-        $this->_file = new DbStream($filename, true);
-        $this->_parseMeta();
-    }
-    
-    public function getMeta():Meta
-    {
-        return $this->_meta;
-    }
-
-    public function getRecord($ip):Record
-    {
-        $ipV4 = BinaryPacker::toV4($ip);
-        if (!empty($ipV4)) {
-            return $this->_getRecordV4($ipV4);
-        }
-        return $this->_getRecordV6($ip);
-    }
-
-    /**
      * PRIVATE SECTION
      */
-    
+
     const START_POS = 0;
     const END_POS = 1;
     const PTR_POS = 2;
-
     const NOT_FOUND_PTR = -1;
 
     /**
@@ -60,7 +28,36 @@ class Client
      */
     private $_internalMeta;
 
-    private function _getMetaLength()
+    /**
+     * PUBLIC SECTION
+     */
+
+    /**
+     * Client constructor.
+     * @param string $filename
+     * @throws \Exception
+     */
+    public function __construct(string $filename)
+    {
+        $this->_file = new DbStream($filename, true);
+        $this->_parseMeta();
+    }
+
+    public function getMeta(): Meta
+    {
+        return $this->_meta;
+    }
+
+    public function getRecord($ip): Record
+    {
+        $ipV4 = BinaryPacker::toV4($ip);
+        if (!empty($ipV4)) {
+            return $this->_getRecordV4($ipV4);
+        }
+        return $this->_getRecordV6($ip);
+    }
+
+    private function _getMetaLength(): int
     {
         return 4 + //STRUCT_VERSION_POS
             4 + //BUILD_VERSION_POS
@@ -82,12 +79,15 @@ class Client
             4; //HASH_V6_PTR_POS
     }
 
-    private function _readInt()
+    private function _readInt(): float
     {
         $buf = $this->_file->read(4);
         return BinaryPacker::unpackInt($buf);
     }
-    
+
+    /**
+     * @throws \Exception
+     */
     private function _parseMeta()
     {
         $length = $this->_getMetaLength() + 4;
@@ -119,16 +119,24 @@ class Client
         $this->_internalMeta->hashV6PtrPos = BinaryPacker::unpackInt(substr($buf, 108, 4));
     }
 
+    /**
+     * @param $val
+     * @return false|float
+     */
     private function _hashFuncV4($val)
     {
         //Usually this shouldn't be so but just in case add this check
         if ($val > $this->_internalMeta->hashV4Max) {
             $val = $this->_internalMeta->hashV4Max;
         }
-        return floor(($val - $this->_internalMeta->hashV4Min)/$this->_internalMeta->hashV4Step);
+        return floor(($val - $this->_internalMeta->hashV4Min) / $this->_internalMeta->hashV4Step);
     }
 
-    private function _hashFuncV6($val)
+    /**
+     * @param $val
+     * @return string|null
+     */
+    private function _hashFuncV6($val): ?string
     {
         //Usually this shouldn't be so but just in case add this check
         if (bccomp($val, $this->_internalMeta->hashV6Max) > 0) {
@@ -138,20 +146,20 @@ class Client
         return bcdiv($tmp, $this->_internalMeta->hashV6Step);
     }
 
-    private function _getHashValsV4($buf, $pos)
+    private function _getHashValsV4($buf, $pos): array
     {
-        $startPos = $pos *12;
+        $startPos = $pos * 12;
         return [
             self::START_POS => BinaryPacker::unpackInt(substr($buf, $startPos, 4)),
-            self::END_POS => BinaryPacker::unpackInt(substr($buf, $startPos+4, 4)),
-            self::PTR_POS => BinaryPacker::unpackInt(substr($buf, $startPos+8, 4)),
+            self::END_POS => BinaryPacker::unpackInt(substr($buf, $startPos + 4, 4)),
+            self::PTR_POS => BinaryPacker::unpackInt(substr($buf, $startPos + 8, 4)),
         ];
     }
 
-    private function _getLeafPtrV4($buf, $searchIPInt)
+    private function _getLeafPtrV4($buf, $searchIPInt): int
     {
         $low = 0;
-        $high = strlen($buf)/12-1;
+        $high = strlen($buf) / 12 - 1;
         $hashLow = $this->_getHashValsV4($buf, $low);
         if ($hashLow[self::START_POS] <= $searchIPInt && $searchIPInt <= $hashLow[self::END_POS]) {
             return $hashLow[self::PTR_POS];
@@ -166,17 +174,17 @@ class Client
         if ($hashHigh[self::END_POS] < $searchIPInt) {
             return self::NOT_FOUND_PTR;
         }
-        
+
         while (1) {
             $nextApprox = round($low +
-                                ($high - $low) *
-                                ($searchIPInt - $hashLow[self::END_POS]) /
-                                ($hashHigh[self::START_POS] - $hashLow[self::END_POS]));
+                ($high - $low) *
+                ($searchIPInt - $hashLow[self::END_POS]) /
+                ($hashHigh[self::START_POS] - $hashLow[self::END_POS]));
             if ($nextApprox == $low) {
                 $nextApprox = $low + 1;
             }
             if ($nextApprox == $high) {
-                $nextApprox = $high -1;
+                $nextApprox = $high - 1;
             }
             $hashCur = $this->_getHashValsV4($buf, $nextApprox);
             if ($hashCur[self::START_POS] <= $searchIPInt && $searchIPInt <= $hashCur[self::END_POS]) {
@@ -215,7 +223,7 @@ class Client
         return substr($buf, 1, ord($buf[0]));
     }
 
-    private function _getLeaf($ptr):Record
+    private function _getLeaf($ptr): Record
     {
         $this->_file->seek($this->_internalMeta->contentPtr + $ptr, SEEK_SET);
         $leaf = new Record();
@@ -235,7 +243,7 @@ class Client
         return $leaf;
     }
 
-    private function _getRecordV4($ip):?Record
+    private function _getRecordV4($ip): ?Record
     {
         $searchIPInt = BinaryPacker::ipV4ToInt($ip);
         if ($searchIPInt < $this->_internalMeta->hashV4Min ||
@@ -254,7 +262,7 @@ class Client
         return $this->_getLeaf($leafPtr);
     }
 
-    private function _getRecordV6($ip):?Record
+    private function _getRecordV6($ip): ?Record
     {
         $searchIPInt = BinaryPacker::ipV6ToBigInt($ip);
         if (bccomp($searchIPInt, $this->_internalMeta->hashV6Min) < 0 ||
@@ -273,20 +281,20 @@ class Client
         return $this->_getLeaf($leafPtr);
     }
 
-    private function _getHashValsV6($buf, $pos)
+    private function _getHashValsV6($buf, $pos): array
     {
         $startPos = $pos * 36;
         return [
             self::START_POS => BinaryPacker::unpackBigInt(substr($buf, $startPos, 16)),
-            self::END_POS => BinaryPacker::unpackBigInt(substr($buf, $startPos+16, 16)),
-            self::PTR_POS => BinaryPacker::unpackInt(substr($buf, $startPos+32, 4)),
+            self::END_POS => BinaryPacker::unpackBigInt(substr($buf, $startPos + 16, 16)),
+            self::PTR_POS => BinaryPacker::unpackInt(substr($buf, $startPos + 32, 4)),
         ];
     }
 
-    private function _getLeafPtrV6($buf, $searchIPInt)
+    private function _getLeafPtrV6($buf, $searchIPInt): int
     {
         $low = 0;
-        $high = strlen($buf)/36-1;
+        $high = strlen($buf) / 36 - 1;
         $hashLow = $this->_getHashValsV6($buf, $low);
         if (bccomp($hashLow[self::START_POS], $searchIPInt) <= 0 &&
             bccomp($searchIPInt, $hashLow[self::END_POS]) <= 0
