@@ -1,6 +1,6 @@
 <?php
 
-namespace ProIPInfo;
+namespace proipinfo\ProIPInfo;
 
 /**
  * Record class contains info about ip address
