@@ -1,29 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ProIPInfo;
 
 /**
- * Record class contains info about ip address
+ * Record class contains info about ip address.
  */
 class Record
 {
-    /**
-     * @var string
-     */
-    public $countryCode;
+    public string $countryCode = '';
 
-    /**
-     * @var string
-     */
-    public $region;
+    public string $region = '';
 
-    /**
-     * @var string
-     */
-    public $city;
+    public string $city = '';
 
-    /**
-     * @var string
-     */
-    public $ISP;
+    public string $ISP = '';
 }

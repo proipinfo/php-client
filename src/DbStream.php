@@ -1,102 +1,102 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ProIPInfo;
 
 /**
- * DbStream internal class for db client
+ * DbStream internal class for db client.
  */
 class DbStream
 {
-    /**
-     * PUBLIC SECTION
-     */
+    /** @psalm-var resource|closed-resource */
+    private $fp;
+    private bool $readOnly;
 
     /**
-     * @param string $fname
-     * @param bool $readOnly
-     * @throws \Exception
+     * @throws \ProIPException
      */
     public function __construct(string $fname, bool $readOnly)
     {
         $this->readOnly = $readOnly;
-        $this->_init($fname);
+        $this->init($fname);
     }
 
     /**
-     * @param string $buf
-     *
-     * @return int|false
-     * @throws \Exception
+     * @throws ProIPException
      */
-    public function write(string $buf)
+    public function write(string $buf): ?int
     {
-        $this->_checkWrite();
+        if (!is_resource($this->fp)) {
+            throw new ProIPException('Writing to closed file');
+        }
+        $this->checkWrite();
+
         return fwrite($this->fp, $buf);
     }
 
     /**
-     * @param int $count
-     *
-     * @return string|false
+     *  @throws ProIPException
      */
-    public function read(int $count)
+    public function read(int $count): ?string
     {
+        if (!is_resource($this->fp)) {
+            throw new ProIPException('Reading from closed file');
+        }
+
         return fread($this->fp, $count);
     }
 
     /**
-     * @return int|false
+     *  @throws ProIPException
      */
-    public function tell()
+    public function tell(): int
     {
+        if (!is_resource($this->fp)) {
+            throw new ProIPException('Reading from closed file');
+        }
+
         return ftell($this->fp);
     }
 
-
     /**
-     * @param $pos
-     * @param int $whence
-     * @return int
+     *  @throws ProIPException
      */
-    public function seek($pos, $whence = SEEK_SET): int
+    public function seek(int $pos, int $whence = SEEK_SET): int
     {
+        if (!is_resource($this->fp)) {
+            throw new ProIPException('Reading from closed file');
+        }
+
         return fseek($this->fp, $pos, $whence);
     }
 
-    /**
-     * @return bool
-     */
-    public function close(): bool
+    public function close(): void
     {
+        if (!is_resource($this->fp)) {
+            return;
+        }
         fclose($this->fp);
     }
 
     /**
-     * PRIVATE SECTION
+     * @throws ProIPException
      */
-
-    private $fp;
-    private $readOnly;
-
-    /**
-     * @param $filename
-     * @throws \Exception
-     */
-    private function _init($filename)
+    protected function checkWrite(): void
     {
-        $this->fp = fopen($filename, ($this->readOnly ? "rb" : "w+b"));
-        if (!$this->fp) {
-            throw new \Exception("Failed to open {$filename}");
+        if ($this->readOnly) {
+            throw new ProIPException('File is read-only');
         }
     }
 
     /**
-     * @throws \Exception
+     * @throws ProIPException
      */
-    private function _checkWrite()
+    private function init(string $fname): void
     {
-        if ($this->readOnly) {
-            throw new \Exception("Файл открыт для чтения");
+        $this->fp = fopen($fname, ($this->readOnly ? 'rb' : 'w+b'));
+        if (!$this->fp) {
+            throw new ProIPException("Failed to open {$fname}");
         }
     }
 }
