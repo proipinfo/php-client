@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<psalm
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="https://getpsalm.org/schema/config"
+        xsi:schemaLocation="https://getpsalm.org/schema/config public/vendor/vimeo/psalm/config.xsd"
+        findUnusedCode="true"
+        checkForThrowsDocblock="true"
+        limitMethodComplexity="true"
+        sealAllMethods="true"
+        allowNamedArgumentCalls="false"
+>
+    <projectFiles xmlns="https://getpsalm.org/schema/config">
+        <directory name="src"/>
+    </projectFiles>
+    <globals>
+        <var name="ROOT" type="public"/>
+    </globals>
+    <plugins>
+        <pluginClass class="Psalm\PhpUnitPlugin\Plugin"/>
+        <pluginClass class="Psalm\SymfonyPsalmPlugin\Plugin"/>
+    </plugins>
+    <issueHandlers>
+        <UndefinedConstant errorLevel="suppress"/>
+        <UnresolvableInclude errorLevel="suppress"/>
+        <DeprecatedClass errorLevel="info"/>
+    </issueHandlers>
+</psalm>
