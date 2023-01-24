@@ -1,5 +1,10 @@
 # PHP client ProIP.info
 
+### Requirements
+
+* PHP 5.6 or newer
+* bcmath extension
+
 ### Installation
 
 ```composer log
