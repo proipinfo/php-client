@@ -14,7 +14,9 @@
       "ProIPInfo\\": "src/"
     }
   },
-  "require": {},
+  "require": {
+      "ext-bcmath": "*",
+  },
   "require-dev": {
       "psalm/plugin-symfony": "^2.3"
   }
