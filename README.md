@@ -24,10 +24,10 @@ $rec = $client->getRecord($ip);
 if (empty($rec)) {
     throw(new \Exception('Not found'));
 }
-echo $client->$countryCode;
-echo $client->$region;
-echo $client->$city;
-echo $client->$ISP;
+echo $client->countryCode;
+echo $client->region;
+echo $client->city;
+echo $client->ISP;
 ```
 
 More information
