@@ -25,10 +25,10 @@ if (empty($rec)) {
     throw(new \Exception('Not found'));
 }
 
-echo $client->countryCode;
-echo $client->region;
-echo $client->city;
-echo $client->ISP;
+echo $rec->countryCode;
+echo $rec->region;
+echo $rec->city;
+echo $rec->ISP;
 ```
 
 More information
