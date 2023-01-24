@@ -18,7 +18,8 @@ composer require proipinfo/php-client
 require dirname(__FILE__) . '/vendor/autoload.php';
 
 $ip='8.8.8.8';
-$client = new ProIPInfo\Client('/path/to/db');
+$db = new ProIPInfo\DbStream('/path/to/db', true);
+$client = new ProIPInfo\Client($db);
 $rec = $client->getRecord($ip);
 if (empty($rec)) {
     throw(new \Exception('Not found'));
