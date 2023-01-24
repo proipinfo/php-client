@@ -17,13 +17,14 @@ composer require proipinfo/php-client
 
 require dirname(__FILE__) . '/vendor/autoload.php';
 
-$ip='8.8.8.8';
 $db = new ProIPInfo\DbStream('/path/to/db', true);
 $client = new ProIPInfo\Client($db);
-$rec = $client->getRecord($ip);
+
+$rec = $client->getRecord('8.8.8.8');
 if (empty($rec)) {
     throw(new \Exception('Not found'));
 }
+
 echo $client->countryCode;
 echo $client->region;
 echo $client->city;
